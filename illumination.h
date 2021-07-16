@@ -11,7 +11,7 @@
 
 const int N_H = (DIM * (DIM - 1)) / 2;
 const int N_BEH = N_OBS;
-const int N_GRID = 5000;
+const int N_GRID = 10000;
 
 typedef array<double, N_H> HGenome;
 typedef array<double, N_BEH> BArr;
