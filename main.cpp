@@ -268,11 +268,43 @@ int main(int argc, char** argv) {
         write_seeds(filename + "_ORACLE.txt");
     }
 
-    cout << "Starting CVT..." << endl;
     vector<double> cvt_arr(N_GRID * N_BEH);
-    int cvt_seed = 8008315, cvt_iter_out;
-    double cvt_diff, cvt_energy;
-    cvt(N_BEH, N_GRID, 1000, 0, 0, 10000, 1000, 50, &cvt_seed, cvt_arr.data(), &cvt_iter_out, &cvt_diff, &cvt_energy);
+    bool use_file_cvt = true;
+    if (use_file_cvt) {
+        ifstream cvt_file(path + to_string(N_GRID) + ".cvt");
+        if (cvt_file.good()) {
+            cout << "Using CVT from " << N_GRID << ".cvt" << endl;
+            try {
+                int CVTL;
+                cvt_file >> CVTL;
+                if (CVTL != N_GRID * N_BEH) {
+                    cout << "Incorrect CVT length at top of CVT file." << endl;
+                    throw runtime_error("Incorrect CVT length at top of CVT file.");
+                }
+                for (int i = 0; i < CVTL; ++i)
+                    cvt_file >> cvt_arr[i];
+            } catch (...) {
+                cout << "CVT reading failed, creating CVT:" << endl;
+                use_file_cvt = false;
+            }
+        } else {
+            use_file_cvt = false;
+        }
+        cvt_file.close();
+    }
+    if (!use_file_cvt) {
+        cout << "Starting CVT..." << endl;
+        int cvt_seed = 123456789, cvt_iter_out;
+        double cvt_diff, cvt_energy;
+        cvt(N_BEH, N_GRID, 1000, 0, 0, 10000, 1000, 50, &cvt_seed,
+            cvt_arr.data(), &cvt_iter_out, &cvt_diff, &cvt_energy);
+        ofstream cvt_file(path + to_string(N_GRID) + message + ".cvt");
+        cvt_file << N_GRID * N_BEH << endl;
+        cvt_file << setprecision(numeric_limits<long double>::digits10 + 1);
+        for (double i : cvt_arr)
+            cvt_file << i << ' ';
+        cvt_file << endl;
+    }
 
     function<int(const BArr&)> get_grid_idx = [&](const BArr& loc) {
         int temp[1];
