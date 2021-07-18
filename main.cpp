@@ -10,19 +10,19 @@
 double T = 2000, DELTA_T, N_T_double = 2000;
 double OR_T = 1000, OR_DT, OR_NTD = 2000;
 int N_T, OR_NT;
-double h_guess_err = 0.02;
+double h_guess_err = 0.20;
 double obs_err = 0.01, amp_err = 0.001;
 int ME_NE_MAX = 2000000, ME_BS = 2000, ME_C0H_EXIT = 100;
 double P_HC = .1, P_HM = .3, S_HM = 15e-3;
-int N_FP = 50, N_FGEN = 2, N_ORACLE = 100, N_FTOURN = 3, GR_F = N_FP - 3, N_PRE_SEEDING = 2;
-double S_FA = 0.05, S_FT = 0.1, A_MAX = 0.1, A_MIN = A_MAX * 0.5, P_FC = 0.8, B_FC = 0.3, P_FM = 0.3, BETA_FCOST = 0;
-int main_start_time, max_runtime_ME = 900, max_runtime_GGA = 12*60*60;
+int N_FP = 20, N_FGEN = 3, N_ORACLE = 100, N_FTOURN = 2, GR_F = N_FP - 2, N_PRE_SEEDING = 2;
+double S_FA = 0.05, S_FT = 0.1, A_MAX = 0.1, A_MIN = A_MAX * 0.5, P_FC = 0.6, B_FC = 0.3, P_FM = 0.3, BETA_FCOST = 0;
+int main_start_time, max_runtime_ME = 900, max_runtime_GGA = 36*60*60;
 int max_seeds_ME = ME_NE_MAX / 1.5;
 double DELTA_S = 0.05, endpoint_O = 5e-10;
 double cost_multiplier = 1;
 int max_gen_O = 2000;
 int seed;
-int N_PFA = 1, N_PFS = 2;
+int N_PFA = 2, N_PFS = 3;
 #if UPDATE_ME_MUTATION_RATE
 double cur_gen_mut = 0, dyn_mut_para = 0.005 / N_FP, dyn_mut_target = .4;
 #endif
