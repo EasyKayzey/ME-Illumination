@@ -140,7 +140,7 @@ pair<HGenome, HGenome> invert_ME(const pair<HGenome, HGenome>& apx_bounds, funct
             vector<double> bias_vals(N_LINES * N_LSAMPLES);
             for (int i = 0; i < N_LINES * N_LSAMPLES; ++i)
                 bias_vals[i] = U1(gen);
-#pragma omp parallel for default(none) shared(N_LINES, N_LBINARY, N_LSAMPLES, L_BIAS, L_EXIT, get_obs, get_cost, get_beh, get_grid_idx, line_starts, apx_bounds, mu_true, line_exit_sum, line_seeds, bias_vals)
+//#pragma omp parallel for default(none) shared(N_LINES, N_LBINARY, N_LSAMPLES, L_BIAS, L_EXIT, get_obs, get_cost, get_beh, get_grid_idx, line_starts, apx_bounds, mu_true, line_exit_sum, line_seeds, bias_vals)
             for (int l = 0; l < N_LINES; ++l) {
                 HGenome &line_start = line_starts[l], biased_endpoint;
                 HGenome lower = mu_true, upper = line_start, mid;
@@ -182,7 +182,7 @@ pair<HGenome, HGenome> invert_ME(const pair<HGenome, HGenome>& apx_bounds, funct
                     seed_saves_using.push_back(true);
                 }
             }
-            cout << "Average line binary search exit length is " << (double) line_exit_sum / N_LBINARY << endl;
+            cout << "Average line binary search exit length is " << (double) line_exit_sum / N_LINES << endl;
         }
 
         cout << "Testing all evaluated seeds..." << endl;
