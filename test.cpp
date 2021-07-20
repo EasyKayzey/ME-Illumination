@@ -6,7 +6,6 @@
 #include "lab.h"
 #include "illumination.h"
 #include "cvt.h"
-#include "oracle.cpp"
 
 
 //extern int N_T;

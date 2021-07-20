@@ -3,7 +3,6 @@
 //
 
 #include "illumination.h"
-#include "oracle.cpp"
 
 extern int ME_NE_MAX, ME_BS, ME_DE, ME_C0H_EXIT;
 extern double P_HC, P_HM, S_HM;
@@ -11,7 +10,7 @@ extern int main_start_time, max_runtime_ME;
 extern int max_seeds_ME;
 extern HGenome mu_true;
 
-unordered_set<HGenome> global_seeds, perfect_seeds, generated_seeds;
+unordered_set<HGenome> global_seeds;
 
 pair<HGenome, HGenome> run_illumination(FConstants& constants, const vector<double>& eps_inter, const OArr& obs_avg,
                                         const OArr& obs_err, rng& gen, function<int(const BArr&)>& get_grid_idx) {
@@ -97,8 +96,8 @@ pair<HGenome, HGenome> invert_ME(const pair<HGenome, HGenome>& apx_bounds, funct
         else
             cout << "Evaluating all " << global_seeds.size() << " global seeds..." << endl;
 #endif
-        vector<bool> seed_saves_using(global_seeds.size() + generated_seeds.size());
-        vector<tuple<HGenome, OArr, double, BArr, int>> seed_saves(global_seeds.size() + generated_seeds.size());
+        vector<bool> seed_saves_using(global_seeds.size());
+        vector<tuple<HGenome, OArr, double, BArr, int>> seed_saves(global_seeds.size());
 #pragma omp parallel
 #pragma omp single
         {
@@ -122,28 +121,6 @@ pair<HGenome, HGenome> invert_ME(const pair<HGenome, HGenome>& apx_bounds, funct
                 }
             }
         }
-        cout << "Evaluating all " << generated_seeds.size() << " generated seeds..." << endl;
-#pragma omp parallel
-#pragma omp single
-        {
-            int seed_i = global_seeds.size();
-            for (auto it = generated_seeds.begin(); it != generated_seeds.end(); ++it, ++seed_i) {
-                seed_saves_using[seed_i] = true;
-#pragma omp task firstprivate(it) shared(seed_saves)
-                {
-                    OArr obs = get_obs(*it);
-                    double cost = get_cost(obs, *it);
-                    int idx = -1;
-                    BArr beh = {NAN};
-                    if (cost >= 0) {
-                        beh = get_beh(obs);
-                        idx = get_grid_idx(beh);
-                    }
-                    seed_saves[seed_i] = {*it, obs, cost, beh, idx};
-                }
-            }
-        }
-#pragma omp taskwait
         cout << "Testing all evaluated seeds..." << endl;
         for (int i = 0; i < (int) seed_saves.size(); ++i) {
             if (seed_saves_using[i]) {
@@ -369,7 +346,7 @@ pair<HGenome, HGenome> invert_ME(const pair<HGenome, HGenome>& apx_bounds, funct
 #endif
 #if _SEED_ALL_C0H_GLOBALLY
     for (int loc : full_locs)
-        generated_seeds.emplace(get<1>(archive[loc]));
+        global_seeds.emplace(get<1>(archive[loc]));
 #endif
 #define UPDATE_C0H_EXIT_NUM true
 #if UPDATE_C0H_EXIT_NUM

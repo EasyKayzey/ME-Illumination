@@ -5,32 +5,28 @@
 #include "illumination.h"
 #include "lab.h"
 #include "cvt.h"
-#include "oracle.cpp"
 
 double T = 2000, DELTA_T, N_T_double = 2000;
-double OR_T = 1000, OR_DT, OR_NTD = 2000;
-int N_T, OR_NT;
+int N_T;
 double h_guess_err = 0.20;
 double obs_err = 0.01, amp_err = 0.001;
 int ME_NE_MAX = 2000000, ME_BS = 2000, ME_C0H_EXIT = 100;
 double P_HC = .1, P_HM = .3, S_HM = 15e-3;
-int N_FP = 20, N_FGEN = 3, N_ORACLE = 100, N_FTOURN = 2, GR_F = N_FP - 2, N_PRE_SEEDING = 2;
+int N_LINES = 1000, N_LBINARY = 10, N_LSAMPLES = 20;
+int N_FP = 20, N_FGEN = 3, N_FTOURN = 2, GR_F = N_FP - 2, N_PRE_SEEDING = 2;
 double S_FA = 0.05, S_FT = 0.1, A_MAX = 0.1, A_MIN = A_MAX * 0.5, P_FC = 0.6, B_FC = 0.3, P_FM = 0.3, BETA_FCOST = 0;
 int main_start_time, max_runtime_ME = 900, max_runtime_GGA = 36*60*60;
 int max_seeds_ME = ME_NE_MAX / 1.5;
-double DELTA_S = 0.05, endpoint_O = 5e-10;
 double cost_multiplier = 1;
-int max_gen_O = 2000;
 int seed;
 int N_PFA = 2, N_PFS = 3;
 #if UPDATE_ME_MUTATION_RATE
 double cur_gen_mut = 0, dyn_mut_para = 0.005 / N_FP, dyn_mut_target = .4;
 #endif
 array<double, L> omega;
-Oracle *oracle_ptr;
 HGenome mu_true;
 
-extern unordered_set<HGenome> global_seeds, perfect_seeds, generated_seeds;
+extern unordered_set<HGenome> global_seeds;
 
 #define FIELD_TESTING false
 
@@ -45,7 +41,7 @@ int main(int argc, char** argv) {
     }
     hash<string> hash_string;
     seed = hash_string(to_string(main_start_time));
-    //seed = 1620617462;
+    seed = 1000;
 
     double init_S_HM = S_HM;
 
@@ -68,7 +64,10 @@ int main(int argc, char** argv) {
 #endif
     }
 
-    string message = "NV1";
+    N_T = (int) round(N_T_double);
+    DELTA_T = T / N_T;
+
+    string message = "LOR";
     if (argc > 1) {
         for (int i = 1; i < argc; ++i) {
             message += '_';
@@ -110,31 +109,6 @@ int main(int argc, char** argv) {
 
     if (cost_multiplier < 0)
         message += "REV";
-
-    // read input
-    {
-//        ifstream infile(string(path) + "!MEGin_" + to_string(DIM) + ".txt");
-//        if (!infile.is_open()) {
-//            cerr << "There was a problem opening the input file for DIM=" << DIM << "." << endl;
-//            cout << "There was a problem opening the input file for DIM=" << DIM << ". Exiting..." << endl;
-//            exit(1);
-//        }
-//        infile.ignore(1000, '\n');
-//        infile >> message >> N_T_double >> T >> h_guess_err >> lab_err >> max_runtime_ME >> ME_RI >> ME_NE_MAX >> ME_BS
-//               >> ME_DE >> ME_C0H_EXIT >> P_HC >> P_HM >> S_HM;
-        N_T = (int) round(N_T_double);
-        OR_NT = (int) round(OR_NTD);
-        DELTA_T = T / N_T;
-        OR_DT = OR_T / OR_NT;
-//        infile.ignore(10, '&');
-//        infile.ignore(100, '\n');
-//        string seedString;
-//        infile >> seedString;
-//        if (seedString != "N")
-//            seed = stoi(seedString);
-//        infile.close();
-        cout << "Successfully read input parameters." << endl;
-    }
 
     string filename = string(path) + "MEG1DATA" + to_string(main_start_time) + (message == "#" ? "" : message);
 
@@ -212,62 +186,55 @@ int main(int argc, char** argv) {
 //        apx_bounds = {fullMin, fullMax};
 //    }
 
-    HGenome guess_h{};
-    vector<tuple<HGenome, vector<double>, double>> oracle_rets(N_ORACLE);
-    bool use_file_oracles = argc > 1;
-    if (use_file_oracles) {
-        ifstream oracle_file(path + string(argv[1]) + ".txt");
-        if (oracle_file.good()) {
-            cout << "Using oracles from " << argv[1] << ".txt" << endl;
+    global_seeds.emplace(mu_true);
+    vector<tuple<HGenome, vector<double>, double>> oracle_rets(N_LINES);
+    bool use_file_seeds = argc > 1;
+    if (use_file_seeds) {
+        ifstream seed_file(path + string(argv[1]) + ".txt");
+        if (seed_file.good()) {
+            cout << "Using seeds from " << argv[1] << ".txt" << endl;
             try {
                 int al;
-                oracle_file >> al;
+                seed_file >> al;
                 HGenome seed{};
                 for (int i = 0; i < al; ++i) {
                     for (int j = 0; j < N_H; ++j)
-                        oracle_file >> seed[j];
+                        seed_file >> seed[j];
                     global_seeds.emplace(seed);
-                }
-                oracle_file >> al;
-                for (int i = 0; i < al; ++i) {
-                    for (int j = 0; j < N_H; ++j)
-                        oracle_file >> seed[j];
-                    perfect_seeds.emplace(seed);
                 }
             } catch (...) {
                 global_seeds.clear();
-                perfect_seeds.clear();
-                cout << "Oracle reading failed, creating oracles:" << endl;
-                use_file_oracles = false;
+                cout << "Seed reading failed." << endl;
+                cerr << "Seed reading failed." << endl;
+                use_file_seeds = false;
             }
         } else {
-            use_file_oracles = false;
+            use_file_seeds = false;
         }
-        oracle_file.close();
-        cout << "Post-read seed sizes: " << global_seeds.size() << " and " << perfect_seeds.size() << endl;
+        seed_file.close();
+        cout << "Post-read seed size: " << global_seeds.size() << endl;
     }
-    if (!use_file_oracles) {
-        for (int r = 0; r < N_ORACLE; ++r) {
-            if (N_ORACLE != 1)
-                cout << "Running oracle " << r << "..." << endl;
-                //        throw runtime_error("Non-zero N_ORACLE not implemented.");
-            else
-                cout << "Running oracle..." << endl;
-
-            for (int i = 0; i < N_H; ++i)
-                guess_h[i] = normalize(U1(gen), apx_bounds.first[i], apx_bounds.second[i]);
-
-            Oracle oracle{gen, mat_to_gen(mu), psi_i, analysis_population[DIM - 1], omega,
-                          analysis_population, H0D, guess_h};
-            oracle_ptr = &oracle;
-
-            oracle_rets[r] = oracle.run_oracle();
-            global_seeds.emplace(get<0>(oracle_rets[r]));
-            perfect_seeds.emplace(get<0>(oracle_rets[r]));
-            ptime();
-        }
-        write_seeds(filename + "_ORACLE.txt");
-    }
+//    if (!use_file_oracles) {
+//        for (int r = 0; r < N_ORACLE; ++r) {
+//            if (N_ORACLE != 1)
+//                cout << "Running oracle " << r << "..." << endl;
+//                //        throw runtime_error("Non-zero N_ORACLE not implemented.");
+//            else
+//                cout << "Running oracle..." << endl;
+//
+//            for (int i = 0; i < N_H; ++i)
+//                guess_h[i] = normalize(U1(gen), apx_bounds.first[i], apx_bounds.second[i]);
+//
+//            Oracle oracle{gen, mat_to_gen(mu), psi_i, analysis_population[DIM - 1], omega,
+//                          analysis_population, H0D, guess_h};
+//            oracle_ptr = &oracle;
+//
+//            oracle_rets[r] = oracle.run_oracle();
+//            global_seeds.emplace(get<0>(oracle_rets[r]));
+//            ptime();
+//        }
+//        write_seeds(filename + "_ORACLE.txt");
+//    }
 
     vector<double> cvt_arr(N_GRID * N_BEH);
     bool use_file_cvt = true;
@@ -346,10 +313,11 @@ int main(int argc, char** argv) {
         ptime();
         cout << "Initializing MAP-Elites seeds with full runs, total of " << N_PRE_SEEDING << endl;
 
-        int real_params_i[] = {ME_C0H_EXIT, max_runtime_ME, ME_NE_MAX};
+        int real_params_i[] = {ME_C0H_EXIT, max_runtime_ME, ME_NE_MAX, N_LINES};
         double real_params_d[] = {S_HM};
         ME_C0H_EXIT = N_GRID;
-        max_runtime_ME *= .7;
+        N_LINES *= 2;
+        max_runtime_ME *= .4;
 //        ME_NE_MAX *= 2;
         for (int r = 0; r < N_PRE_SEEDING; ++r) {
             for (FGenome &f : population)
@@ -360,6 +328,7 @@ int main(int argc, char** argv) {
         ME_C0H_EXIT = real_params_i[0];
         max_runtime_ME = real_params_i[1];
         ME_NE_MAX = real_params_i[2];
+        N_LINES = real_params_i[3];
         S_HM = real_params_d[0];
     }
 
@@ -480,12 +449,12 @@ int main(int argc, char** argv) {
             ofstream outfile(filename + "_HEARTBEAT.txt", ofstream::trunc);
             cout << "Filename is " << filename << "_HEARTBEAT.txt" << endl;
 
-            int out_ints[] = {DIM, N_T, OR_NT, ME_NE_MAX, ME_BS, ME_C0H_EXIT, N_FP, N_FGEN, N_FTOURN, N_ORACLE, GR_F,
-                              main_start_time, max_runtime_ME, max_runtime_GGA, seed, N_OF, max_gen_O, L, s,
+            int out_ints[] = {DIM, N_T, N_LINES, ME_NE_MAX, ME_BS, ME_C0H_EXIT, N_FP, N_FGEN, N_FTOURN, -1, GR_F,
+                              main_start_time, max_runtime_ME, max_runtime_GGA, seed, N_LBINARY, N_LSAMPLES, L, s,
                               (int) global_seeds.size(), N_PRE_SEEDING, N_GRID, N_TO, N_OBS, N_PFA, max_seeds_ME, -1, -1,
                               -1, -1, -1, -1, -1, -1, -1};
-            double out_doubles[] = {T, h_guess_err, OR_T, P_HC, P_HM, S_HM, S_FA, S_FT, A_MAX, P_FC, P_FM, BETA_FCOST,
-                                    -1, HBAR, DELTA_S, endpoint_O, obs_err, amp_err, dyn_mut_para, dyn_mut_target,
+            double out_doubles[] = {T, h_guess_err, -1, P_HC, P_HM, S_HM, S_FA, S_FT, A_MAX, P_FC, P_FM, BETA_FCOST,
+                                    -1, HBAR, -1, -1, obs_err, amp_err, dyn_mut_para, dyn_mut_target,
                                     init_S_HM, B_FC, A_MIN, cost_multiplier, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
 
             if (message.empty())
@@ -706,25 +675,25 @@ int main(int argc, char** argv) {
 
         for (int r = 0; r < N_PFA; ++r) {
             global_seeds.clear();
-            perfect_seeds.clear();
-            for (int ro = 0; ro < N_ORACLE; ++ro) {
-                if (N_ORACLE != 1)
-                    cout << "Running oracle " << ro << "..." << endl;
-                    //        throw runtime_error("Non-zero N_ORACLE not implemented.");
-                else
-                    cout << "Running oracle..." << endl;
+//            for (int ro = 0; ro < N_LINES; ++ro) {
+//                if (N_LINES != 1)
+//                    cout << "Running oracle " << ro << "..." << endl;
+//                    //        throw runtime_error("Non-zero N_ORACLE not implemented.");
+//                else
+//                    cout << "Running oracle..." << endl;
+//
+//                for (int i = 0; i < N_H; ++i)
+//                    guess_h[i] = normalize(U1(gen), apx_bounds.first[i], apx_bounds.second[i]);
+//
+//                Oracle oracle{gen, mat_to_gen(mu), psi_i, analysis_population[DIM - 1], omega, analysis_population, H0D, guess_h};
+//                oracle_ptr = &oracle;
+//
+//                oracle_rets[ro] = oracle.run_oracle();
+//                global_seeds.emplace(get<0>(oracle_rets[ro]));
+//                ptime();
+//            }
 
-                for (int i = 0; i < N_H; ++i)
-                    guess_h[i] = normalize(U1(gen), apx_bounds.first[i], apx_bounds.second[i]);
-
-                Oracle oracle{gen, mat_to_gen(mu), psi_i, analysis_population[DIM - 1], omega, analysis_population, H0D, guess_h};
-                oracle_ptr = &oracle;
-
-                oracle_rets[ro] = oracle.run_oracle();
-                global_seeds.emplace(get<0>(oracle_rets[ro]));
-                perfect_seeds.emplace(get<0>(oracle_rets[ro]));
-                ptime();
-            }
+            N_LINES *= 2;
 
 //            ME_NE_MAX = CMNM;
 //            cout << "\n\nr =" << r << "; " << ME_NE_MAX << "; " << S_HM << endl;
@@ -768,9 +737,6 @@ double envelope_funct(double t) {
     return exp(-30 * (2 * t / T - .5) * (2 * t / T - .5)) + exp(-30 * ((2 * t - T) / T - .5) * ((2 * t - T) / T - .5));
 }
 
-double envelope_funct_OR(double t) {
-    return exp(-30 * (t / OR_T - .5) * (t / OR_T - .5));
-}
 
 pair<pair<EMatrix, EMatrix>, EVector> diag_vec(const EMatrix& mu, const EDMatrix& C) {
     ComplexSchur<EMatrix> schur;
@@ -903,7 +869,7 @@ tuple<double, double, HGenome, HGenome> get_f_cost(const FGenome& epsilon, rng& 
         flu += d * d;
     flu /= N_T;
 
-    HGenome true_vals = *perfect_seeds.begin();
+    HGenome true_vals = mu_true;
 
     double dH = 0;
     for (int i = 0; i < N_H; ++i)
@@ -985,19 +951,8 @@ void write_sfa(tuple<double, double, HGenome, HGenome> cost, ofstream& file, int
 void write_seeds(string filename) {
     ofstream preseeding_file(filename);
     preseeding_file << setprecision(numeric_limits<long double>::digits10 + 1);
-    preseeding_file << generated_seeds.size() + global_seeds.size() << endl;
-    for (auto& cs : generated_seeds) {
-        for (double d : cs)
-            preseeding_file << d << ' ';
-        preseeding_file << endl;
-    }
+    preseeding_file << global_seeds.size() << endl;
     for (auto& cs : global_seeds) {
-        for (double d : cs)
-            preseeding_file << d << ' ';
-        preseeding_file << endl;
-    }
-    preseeding_file << perfect_seeds.size() << endl;
-    for (auto& cs : perfect_seeds) {
         for (double d : cs)
             preseeding_file << d << ' ';
         preseeding_file << endl;

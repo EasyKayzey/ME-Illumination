@@ -54,7 +54,6 @@ typedef mt19937 rng;
 int main(int argc, char** argv);
 
 double envelope_funct(double t);
-double envelope_funct_OR(double t);
 
 pair<pair<EMatrix, EMatrix>, EVector> diag_vec(const EMatrix& mu, const EDMatrix& C);
 
