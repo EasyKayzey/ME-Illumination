@@ -13,6 +13,7 @@ double obs_err = 0.01, amp_err = 0.001;
 int ME_NE_MAX = 2000000, ME_BS = 2000, ME_C0H_EXIT = 100;
 double P_HC = .1, P_HM = .3, S_HM = 15e-3;
 int N_LINES = 1000, N_LBINARY = 10, N_LSAMPLES = 20;
+double L_EXIT = 1e-8, L_BIAS = 1.5;
 int N_FP = 20, N_FGEN = 3, N_FTOURN = 2, GR_F = N_FP - 2, N_PRE_SEEDING = 2;
 double S_FA = 0.05, S_FT = 0.1, A_MAX = 0.1, A_MIN = A_MAX * 0.5, P_FC = 0.6, B_FC = 0.3, P_FM = 0.3, BETA_FCOST = 0;
 int main_start_time, max_runtime_ME = 900, max_runtime_GGA = 36*60*60;
@@ -164,14 +165,14 @@ int main(int argc, char** argv) {
         HGenome max = min;
         for (int i = 0; i < L; i++) {
             if (min[i] > 0) {
-                min[i] *= down(gen);
-                max[i] *= up(gen);
+                min[i] *= 1 - h_guess_err;
+                max[i] *= 1 + h_guess_err;
             } else if (min[i] < 0) {
-                min[i] *= up(gen);
-                max[i] *= down(gen);
+                min[i] *= 1 + h_guess_err;
+                max[i] *= 1 - h_guess_err;
             } else {
-                max[i] = .0001 * (up(gen) - 1);
-                min[i] = .0001 * (down(gen) - 1);
+                max[i] = .001 * (up(gen) - 1);
+                min[i] = .001 * (down(gen) - 1);
             }
         }
         apx_bounds = {min, max};
@@ -454,7 +455,7 @@ int main(int argc, char** argv) {
                               (int) global_seeds.size(), N_PRE_SEEDING, N_GRID, N_TO, N_OBS, N_PFA, max_seeds_ME, -1, -1,
                               -1, -1, -1, -1, -1, -1, -1};
             double out_doubles[] = {T, h_guess_err, -1, P_HC, P_HM, S_HM, S_FA, S_FT, A_MAX, P_FC, P_FM, BETA_FCOST,
-                                    -1, HBAR, -1, -1, obs_err, amp_err, dyn_mut_para, dyn_mut_target,
+                                    -1, HBAR, L_EXIT, L_BIAS, obs_err, amp_err, dyn_mut_para, dyn_mut_target,
                                     init_S_HM, B_FC, A_MIN, cost_multiplier, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
 
             if (message.empty())

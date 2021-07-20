@@ -44,4 +44,8 @@ void pairsort(tuple<double, double, HGenome, HGenome> *a, FGenome *b, int n, dou
 
 void write_sfa(tuple<double, double, HGenome, HGenome> cost, ofstream& file, int n);
 
+HGenome bias_HG(HGenome& t, HGenome& o, double bias);
+
+double sqdist_HG(HGenome& a, HGenome& b);
+
 #endif //ME_ILLUMINATION_H

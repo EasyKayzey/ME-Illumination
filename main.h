@@ -16,6 +16,7 @@
 #include <chrono>
 #include <unordered_set>
 #include <iomanip>
+#include <atomic>
 #include "Eigen/Core"
 #include "Eigen/Eigenvalues"
 #include "omp.h"

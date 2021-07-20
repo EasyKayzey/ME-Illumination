@@ -8,6 +8,8 @@ extern int ME_NE_MAX, ME_BS, ME_DE, ME_C0H_EXIT;
 extern double P_HC, P_HM, S_HM;
 extern int main_start_time, max_runtime_ME;
 extern int max_seeds_ME;
+extern int N_LINES, N_LBINARY, N_LSAMPLES;
+extern double L_EXIT, L_BIAS;
 extern HGenome mu_true;
 
 unordered_set<HGenome> global_seeds;
@@ -121,12 +123,73 @@ pair<HGenome, HGenome> invert_ME(const pair<HGenome, HGenome>& apx_bounds, funct
                 }
             }
         }
+
+
+        {
+            cout << "Running lines:" << endl;
+            vector<HGenome> line_starts(N_LINES);
+            for (int l = 0; l < N_LINES; ++l) {
+                HGenome line_start{};
+                for (int i = 0; i < N_H; ++i)
+                    line_start[i] = normalize(U1(gen), apx_bounds.first[i], apx_bounds.second[i]);
+                line_starts[l] = line_start;
+            }
+
+            atomic_int line_exit_sum = 0;
+            vector<vector<tuple<HGenome, OArr, double, BArr, int>>> line_seeds(N_LINES);
+            vector<double> bias_vals(N_LINES * N_LSAMPLES);
+            for (int i = 0; i < N_LINES * N_LSAMPLES; ++i)
+                bias_vals[i] = U1(gen);
+#pragma omp parallel for default(none) shared(N_LINES, N_LBINARY, N_LSAMPLES, L_BIAS, L_EXIT, get_obs, get_cost, get_beh, get_grid_idx, line_starts, apx_bounds, mu_true, line_exit_sum, line_seeds, bias_vals)
+            for (int l = 0; l < N_LINES; ++l) {
+                HGenome &line_start = line_starts[l], biased_endpoint;
+                HGenome lower = mu_true, upper = line_start, mid;
+                int bsi;
+                for (bsi = 0; bsi < N_LBINARY && sqdist_HG(lower, upper) > L_EXIT; ++bsi) {
+                    mid = bias_HG(lower, upper, 0.5);
+                    OArr obs = get_obs(mid);
+                    double cost = get_cost(obs, mid);
+                    if (cost < 0) {
+                        BArr beh{NAN};
+                        line_seeds[l].emplace_back(mid, obs, cost, beh, -1);
+                        upper = mid;
+                    } else {
+                        BArr beh = get_beh(obs);
+                        int idx = get_grid_idx(beh);
+                        line_seeds[l].emplace_back(mid, obs, cost, beh, idx);
+                        lower = mid;
+                    }
+                }
+                line_exit_sum += bsi;
+                biased_endpoint = bias_HG(mu_true, mid, L_BIAS);
+                for (int i = 0; i < N_LSAMPLES; ++i) {
+                    HGenome cur_sam = bias_HG(mu_true, biased_endpoint, bias_vals[l * N_LSAMPLES + i]);
+                    OArr obs = get_obs(cur_sam);
+                    double cost = get_cost(obs, cur_sam);
+                    if (cost < 0) {
+                        BArr beh{NAN};
+                        line_seeds[l].emplace_back(cur_sam, obs, cost, beh, -1);
+                    } else {
+                        BArr beh = get_beh(obs);
+                        int idx = get_grid_idx(beh);
+                        line_seeds[l].emplace_back(cur_sam, obs, cost, beh, idx);
+                    }
+                }
+            }
+            for (auto& t : line_seeds) {
+                for (auto& tu : t) {
+                    seed_saves.push_back(tu);
+                    seed_saves_using.push_back(true);
+                }
+            }
+            cout << "Average line binary search exit length is " << (double) line_exit_sum / N_LBINARY << endl;
+        }
+
         cout << "Testing all evaluated seeds..." << endl;
         for (int i = 0; i < (int) seed_saves.size(); ++i) {
             if (seed_saves_using[i]) {
                 auto &c_seed_s = seed_saves[i];
                 HGenome c_seed = get<0>(c_seed_s);
-                OArr obs = get<1>(c_seed_s);
                 double cost = get<2>(c_seed_s);
                 if (cost >= 0) {
 #if _USE_ALL_C0H
@@ -148,17 +211,8 @@ pair<HGenome, HGenome> invert_ME(const pair<HGenome, HGenome>& apx_bounds, funct
                     }
                 }
             }
-#if _LOG_ME
-//            cout << "Seed data: " << cost << endl;
-//            cout << idx << endl;
-//            for (int i = 0; i < N_OBS; ++i)
-//                cout << obs[i] << ' ';
-//            cout << endl;
-//            for (int i = 0; i < N_BEH; ++i)
-//                cout << beh[i] << ' ';
-//            cout << endl << endl;
-#endif
         }
+
         if (nc0s == 0) {
             cout << "PROBLEM: No cost-zero Hamiltonians found. This message is long so that it will be easily "
                  << "noticed. Returning a large value and setting main start time to be zero." << endl;
@@ -414,4 +468,18 @@ pair<int, int> normalize_curiosity(vector<int> &curiosity_index) {
         sum += curiosity_index[i];
     }
     return {num, sum};
+}
+
+HGenome bias_HG(HGenome& t, HGenome& o, double bias) {
+    HGenome c{};
+    for (int i = 0; i < N_H; ++i)
+        c[i] = bias * o[i] - (bias - 1) * t[i];
+    return c;
+}
+
+double sqdist_HG(HGenome& a, HGenome& b) {
+    double sqdist = 0;
+    for (int i = 0; i < N_H; ++i)
+        sqdist += (a[i] - b[i]) * (a[i] - b[i]);
+    return sqdist;
 }
