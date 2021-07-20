@@ -19,4 +19,4 @@ ELSE()
     link_libraries(stdc++fs)
 ENDIF()
 
-add_executable(ME-Illumination main.cpp main.h illumination.cpp illumination.h lab.cpp lab.h test.cpp cvt.cpp cvt.h oracle.cpp oracle.h)
+add_executable(ME-Illumination main.cpp main.h illumination.cpp illumination.h lab.cpp lab.h test.cpp cvt.cpp cvt.h)
