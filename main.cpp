@@ -7,7 +7,7 @@
 #include "cvt.h"
 
 double T = 10, DELTA_T, N_T_double = 2000;
-int N_T, OR_NT;
+int N_T;
 double h_guess_err = 0.20;
 double obs_err = 0.01, amp_err = 0.001;
 int ME_NE_MAX = 2000000, ME_BS = 2000, ME_C0H_EXIT = 100;
