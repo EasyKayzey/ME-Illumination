@@ -6,8 +6,8 @@
 #include "lab.h"
 #include "cvt.h"
 
-double T = 2000, DELTA_T, N_T_double = 2000;
-int N_T;
+double T = 10, DELTA_T, N_T_double = 2000;
+int N_T, OR_NT;
 double h_guess_err = 0.20;
 double obs_err = 0.01, amp_err = 0.001;
 int ME_NE_MAX = 2000000, ME_BS = 2000, ME_C0H_EXIT = 100;
@@ -15,7 +15,7 @@ double P_HC = .1, P_HM = .3, S_HM = 15e-3;
 int N_LINES = 1000, N_LBINARY = 10, N_LSAMPLES = 20;
 double L_EXIT = 1e-8, L_BIAS = 1.5;
 int N_FP = 20, N_FGEN = 3, N_FTOURN = 2, GR_F = N_FP - 2, N_PRE_SEEDING = 2;
-double S_FA = 0.05, S_FT = 0.1, A_MAX = 0.1, A_MIN = A_MAX * 0.5, P_FC = 0.6, B_FC = 0.3, P_FM = 0.3, BETA_FCOST = 0;
+double S_FA = 0.05, S_FT = 0.1, A_MAX = 1, A_MIN = A_MAX * 0.5, P_FC = 0.6, B_FC = 0.3, P_FM = 0.3, BETA_FCOST = 0;
 int main_start_time, max_runtime_ME = 900, max_runtime_GGA = 36*60*60;
 int max_seeds_ME = ME_NE_MAX / 1.5;
 double cost_multiplier = 1;
@@ -125,17 +125,16 @@ int main(int argc, char** argv) {
     EMatrix mu;
     // h0, mu values
     {
-        H0D << 0, 0.00820226918, 0.01558608386, 0.02215139847, 0.02789825857, 0.03282661861;
+        H0D << 1.5074, 9.9261, 12.9429, 14.0673, 14.5895, 14.9364;
 //    cout << "H_0 diagonal:" << endl << H0.toDenseMatrix() << endl;
 
         EMatrix mu_upper;
-        mu_upper <<  0, 0.06116130402, -0.01272999623, 0.003275382148, -0.0009801377618, 0.0003314304586,
-                     0, 0,              0.0834968862, -0.02150346764,   0.006457586337, -0.002195579355,
-                     0, 0,              0,             0.09850502453,  -0.02960110398,   0.01003668145,
-                     0, 0,              0,             0,               0.1093531798,   -0.0371225703,
-                     0, 0,              0,             0,               0,               0.1171966409,
-                     0, 0,              0,             0,               0,               0;
-
+        mu_upper << 0,  1.4601, 1.2416, 0.9739, 0.6345, 0.3871,
+                    0,  0,      1.7332, 0.5390, 0.6147, 0.4309,
+                    0,  0,      0,      1.4425, 0.8356, 0.4289,
+                    0,  0,      0,      0,      1.5264, 0.7678,
+                    0,  0,      0,      0,      0,      0.9876,
+                    0,  0,      0,      0,      0,      0;
         mu = mu_upper + mu_upper.transpose();
 //        cout << "mu:" << endl << mu.real() << endl;
     }
