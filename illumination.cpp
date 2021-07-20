@@ -161,7 +161,7 @@ pair<HGenome, HGenome> invert_ME(const pair<HGenome, HGenome>& apx_bounds, funct
                     }
                 }
                 line_exit_sum += bsi;
-                biased_endpoint = bias_HG(mu_true, mid, L_BIAS);
+                biased_endpoint = bias_HG(mu_true, upper, L_BIAS);
                 for (int i = 0; i < N_LSAMPLES; ++i) {
                     HGenome cur_sam = bias_HG(mu_true, biased_endpoint, bias_vals[l * N_LSAMPLES + i]);
                     OArr obs = get_obs(cur_sam);
