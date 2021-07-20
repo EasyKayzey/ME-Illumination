@@ -134,12 +134,12 @@ pair<HGenome, HGenome> invert_ME(const pair<HGenome, HGenome>& apx_bounds, funct
                     line_start[i] = normalize(U1(gen), apx_bounds.first[i], apx_bounds.second[i]);
                 line_starts[l] = line_start;
             }
-
-            atomic_int line_exit_sum = 0;
-            vector<vector<tuple<HGenome, OArr, double, BArr, int>>> line_seeds(N_LINES);
             vector<double> bias_vals(N_LINES * N_LSAMPLES);
             for (int i = 0; i < N_LINES * N_LSAMPLES; ++i)
                 bias_vals[i] = U1(gen);
+
+            atomic_int line_exit_sum = 0;
+            vector<vector<tuple<HGenome, OArr, double, BArr, int>>> line_seeds(N_LINES);
 #pragma omp parallel for default(none) shared(N_LINES, N_LBINARY, N_LSAMPLES, L_BIAS, L_EXIT, get_obs, get_cost, get_beh, get_grid_idx, line_starts, apx_bounds, mu_true, line_exit_sum, line_seeds, bias_vals)
             for (int l = 0; l < N_LINES; ++l) {
                 HGenome &line_start = line_starts[l], biased_endpoint;
