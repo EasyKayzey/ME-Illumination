@@ -14,7 +14,7 @@ int ME_NE_MAX = 2000000, ME_BS = 2000, ME_C0H_EXIT = 100;
 double P_HC = .1, P_HM = .3, S_HM = 15e-3;
 int N_LINES = 1000, N_LBINARY = 10, N_LSAMPLES = 20;
 double L_EXIT = 1e-8, L_BIAS = 1.5;
-int N_FP = 20, N_FGEN = 3, N_FTOURN = 2, GR_F = N_FP - 2, N_PRE_SEEDING = 2;
+int N_FP = 1, N_FGEN = 3, N_FTOURN = 1, GR_F = 0, N_PRE_SEEDING = 0;
 double S_FA = 0.05, S_FT = 0.1, A_MAX = 1, A_MIN = A_MAX * 0.5, P_FC = 0.6, B_FC = 0.3, P_FM = 0.3, BETA_FCOST = 0;
 int main_start_time, max_runtime_ME = 900, max_runtime_GGA = 36*60*60;
 int max_seeds_ME = ME_NE_MAX / 1.5;
