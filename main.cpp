@@ -20,7 +20,7 @@ int main_start_time, max_runtime_ME = 900, max_runtime_GGA = 36*60*60;
 int max_seeds_ME = ME_NE_MAX / 1.5;
 double cost_multiplier = 1;
 int seed;
-int N_PFA = 2, N_PFS = 3;
+int N_PFA = 2, N_PFS = 2;
 #if UPDATE_ME_MUTATION_RATE
 double cur_gen_mut = 0, dyn_mut_para = 0.005 / N_FP, dyn_mut_target = .4;
 #endif
