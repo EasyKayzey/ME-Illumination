@@ -41,7 +41,7 @@ pair<HGenome, HGenome> run_illumination(FConstants& constants, const vector<doub
             double t = mu[i] - mu_true[i];
             cost += t * t;
         }
-        return cost;
+        return 1;
     };
     function<BArr(const OArr&)> get_beh = [&](const OArr& sim_obs) -> BArr {
         BArr beh;
@@ -49,8 +49,77 @@ pair<HGenome, HGenome> run_illumination(FConstants& constants, const vector<doub
             beh[i] = (sim_obs[i] - obs_avg[i] + obs_err[i]) / (2 * obs_err[i]);
         return beh;
     };
-    auto MER = invert_ME(apx_bounds, get_obs, get_beh, get_grid_idx, get_cost, gen);
-    return MER;
+
+    uniform_real_distribution<> U1(0, 1);
+    OArr low, high;
+    for (int i = 0; i < N_OBS; ++i)
+        low[i] = obs_avg[i] - 1.2*obs_err[i];
+    for (int i = 0; i < N_OBS; ++i)
+        high[i] = obs_avg[i] + 1.2*obs_err[i];
+    int N_P = 1000000;
+    double md = 1.35;
+
+    vector<OArr> sams(N_P);
+    for (int i = 0; i < N_P; ++i)
+        for (int j = 0; j < N_OBS; ++j)
+            sams[i][j] = normalize(U1(gen), low[j], high[j]);
+
+typedef Matrix<double, DIM, 1> VV;
+    vector<int> ixs(N_P);
+    atomic_int R1 = 0, R2 = 0;
+#pragma omp parallel for default(shared)
+    for (int l = 0; l < N_P; ++l) {
+        OArr og = sams[l];
+        OArr& nl = sams[l];
+        VV ll, uu;
+        for (int i = 0; i < DIM; ++i)
+            ll[i] = og[i];
+        ll[0] -= 1;
+        for (int i = 0; i < DIM; ++i)
+            uu[i] = og[i+DIM];
+        uu[0] -= 1;
+        VV nn;
+        nn.setOnes();
+        ll = ll.dot(nn) * nn / DIM;
+        ll[0] += 1;
+        uu = uu.dot(nn) * nn / DIM;
+        uu[0] += 1;
+        for (int i = 0; i < DIM; ++i)
+            nl[i] = ll[i];
+        for (int i = 0; i < DIM; ++i)
+            nl[i+DIM] = uu[i];
+
+        double d = 0;
+        for (int i = 0; i < N_OBS; ++i)
+            d += (nl[i] - og[i]) * (nl[i] - og[i]);
+        if (d > md) {
+            ++R1;
+            ixs[l] = -1;
+        } else if (get_cost(nl, {1}) < 0) {
+            ixs[l] = -1;
+            ++R2;
+        } else {
+            ixs[l] = get_grid_idx(get_beh(nl));
+        }
+    }
+    vector<int> iss(N_GRID);
+    int rej = 0;
+    for (int i : ixs) {
+        if (i < 0)
+            ++rej;
+        else
+            ++iss[i];
+    }
+    cout << "REJ " << rej << endl;
+    for (int i : iss)
+        cout << i << ' ';
+    cout << endl << "REJ " << rej << ' ' << R1 << ' ' << R2 << endl;
+
+
+    exit(0);
+
+//    auto MER = invert_ME(apx_bounds, get_obs, get_beh, get_grid_idx, get_cost, gen);
+    return apx_bounds;
 }
 
 #define _LOG_ME true
