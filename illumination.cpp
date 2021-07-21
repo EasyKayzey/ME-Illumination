@@ -10,6 +10,7 @@ extern int main_start_time, max_runtime_ME;
 extern int max_seeds_ME;
 extern int N_LINES, N_LBINARY, N_LSAMPLES;
 extern double L_EXIT, L_BIAS;
+extern double h_guess_err;
 extern HGenome mu_true;
 
 unordered_set<HGenome> global_seeds;
@@ -127,13 +128,26 @@ pair<HGenome, HGenome> invert_ME(const pair<HGenome, HGenome>& apx_bounds, funct
 
         {
             cout << "Running lines:" << endl;
+
             vector<HGenome> line_starts(N_LINES);
-            for (int l = 0; l < N_LINES; ++l) {
+            int N_HARDCODED_STARTS = N_H * 2;
+            if (N_LINES < N_HARDCODED_STARTS) {
+                cout << "ERROR: N_LINES is leq to N_HARDCODED_STARTS. This will be ignored." << endl;
+                cerr << "ERROR: N_LINES is leq to N_HARDCODED_STARTS. This will be ignored." << endl;
+            }
+            for (int l = 0; l < N_HARDCODED_STARTS; ++l) {
+                HGenome line_start = mu_true;
+                line_start[l / 2] = line_start[l / 2] * (1 + ((l % 2) * 2 - 1) * h_guess_err);
+                line_starts[l] = line_start;
+            }
+
+            for (int l = N_HARDCODED_STARTS; l < N_LINES; ++l) {
                 HGenome line_start{};
                 for (int i = 0; i < N_H; ++i)
                     line_start[i] = normalize(U1(gen), apx_bounds.first[i], apx_bounds.second[i]);
                 line_starts[l] = line_start;
             }
+
             vector<double> bias_vals(N_LINES * N_LSAMPLES);
             for (int i = 0; i < N_LINES * N_LSAMPLES; ++i)
                 bias_vals[i] = U1(gen);
@@ -176,6 +190,7 @@ pair<HGenome, HGenome> invert_ME(const pair<HGenome, HGenome>& apx_bounds, funct
                     }
                 }
             }
+
             for (auto& t : line_seeds) {
                 for (auto& tu : t) {
                     seed_saves.push_back(tu);
