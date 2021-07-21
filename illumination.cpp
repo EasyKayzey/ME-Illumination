@@ -111,9 +111,12 @@ typedef Matrix<double, DIM, 1> VV;
             ++iss[i];
     }
     cout << "REJ " << rej << endl;
-    for (int i : iss)
+    int nnn = 0;
+    for (int i : iss) {
         cout << i << ' ';
-    cout << endl << "REJ " << rej << ' ' << R1 << ' ' << R2 << endl;
+        nnn += i > 0;
+    }
+    cout << endl << "REJ " << rej << ' ' << R1 << ' ' << R2 << ' ' << nnn << endl;
 
 
     exit(0);
