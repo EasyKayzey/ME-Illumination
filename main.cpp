@@ -876,7 +876,7 @@ tuple<double, double, HGenome, HGenome> get_f_cost(const FGenome& epsilon, rng& 
 
     double dH = 0;
     for (int i = 0; i < N_H; ++i)
-        if (maxH[i] + minH[i] != 0)
+        if (true_vals[i] != 0)
             dH += abs((maxH[i] - minH[i]) / (2 * true_vals[i]));
 
     cout << "dH equals " << dH << endl << endl;
