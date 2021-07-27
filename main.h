@@ -61,8 +61,6 @@ pair<pair<EMatrix, EMatrix>, EVector> diag_vec(const EMatrix& mu, const EDMatrix
 OArr evolve_initial(const vector<double>& epsilon, const EMatrix& CP, const EMatrix& PdC, const EMatrix& PdCCP,
                     const EVector& lambda, const EVector& psi_i, const array<ECovector, DIM>& anal_pop);
 
-inline double normalize(double rand, double min, double max);
-
 complex<double> get_only_element(Matrix<complex<double>, -1, -1> scalar);
 
 pair<int, int> calc_loc(int u_i);
@@ -80,6 +78,10 @@ template <class T, class F, size_t N> void print_arr(vector<array<T, N>> vec, of
 void write_seeds(string filename);
 
 void ptime();
+
+inline double normalize(double rand, double min, double max) {
+    return rand * (max - min) + min;
+}
 
 // Some of the methods are actually in illumination.h because they need illumination typedefs
 // and if I try to include illumination.h clion breaks...

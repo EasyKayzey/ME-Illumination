@@ -784,10 +784,6 @@ OArr evolve_initial(const vector<double>& epsilon, const EMatrix& CP, const EMat
     return samples;
 }
 
-inline double normalize(double rand, double min, double max) {
-    return rand * (max - min) + min;
-}
-
 complex<double> get_only_element(Matrix<complex<double>, -1, -1> scalar) {
     if (scalar.rows() > 1 || scalar.cols() > 1) {
         cout << scalar << endl;
