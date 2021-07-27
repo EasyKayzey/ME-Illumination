@@ -61,7 +61,7 @@ pair<pair<EMatrix, EMatrix>, EVector> diag_vec(const EMatrix& mu, const EDMatrix
 OArr evolve_initial(const vector<double>& epsilon, const EMatrix& CP, const EMatrix& PdC, const EMatrix& PdCCP,
                     const EVector& lambda, const EVector& psi_i, const array<ECovector, DIM>& anal_pop);
 
-double normalize(double rand, double min, double max);
+inline double normalize(double rand, double min, double max);
 
 complex<double> get_only_element(Matrix<complex<double>, -1, -1> scalar);
 

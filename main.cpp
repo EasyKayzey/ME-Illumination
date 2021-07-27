@@ -171,8 +171,9 @@ int main(int argc, char** argv) {
                 min[i] *= 1 + h_guess_err;
                 max[i] *= 1 - h_guess_err;
             } else {
-                max[i] = .001 * (up(gen) - 1);
-                min[i] = .001 * (down(gen) - 1);
+//                max[i] = .001 * (up(gen) - 1);
+//                min[i] = .001 * (down(gen) - 1);
+                max[i] = min[i] = 0;
             }
         }
         apx_bounds = {min, max};
@@ -783,7 +784,7 @@ OArr evolve_initial(const vector<double>& epsilon, const EMatrix& CP, const EMat
     return samples;
 }
 
-double normalize(double rand, double min, double max) {
+inline double normalize(double rand, double min, double max) {
     return rand * (max - min) + min;
 }
 
