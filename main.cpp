@@ -294,10 +294,10 @@ int main(int argc, char** argv) {
             epsilon[j].first = U1(gen) * (A_MAX - A_MIN) + A_MIN;
             epsilon[j].second = UT(gen);
         }
-//        for (int z : {6, 10, 11})
-//            epsilon[z].first = 0;
+        for (int z : {6, 10, 11})
+            epsilon[z].first = 0;
 
-//        pair<FGenome, vector<double>> cur(epsilon, f_to_inter_t(epsilon));
+        pair<FGenome, vector<double>> cur(epsilon, f_to_inter_t(epsilon));
         population[i] = epsilon;
     }
 #endif
