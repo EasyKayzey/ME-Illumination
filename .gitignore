@@ -145,3 +145,9 @@ fabric.properties
 
 # output
 QCDATA*
+
+
+
+# vscode? -EIM
+.vscode/*
+build/*
