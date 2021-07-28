@@ -383,7 +383,7 @@ int main(int argc, char** argv) {
             // Mutation
             for (int j = 0; j < L; ++j) {
                 if (U1(gen) < P_FM)
-                    child[j].first *= NA(gen);
+                    child[j].first = min(A_MAX, child[j].first * NA(gen));
                 if (U1(gen) < P_FM)
                     child[j].second += NT(gen);
             }
