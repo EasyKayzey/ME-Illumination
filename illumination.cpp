@@ -271,6 +271,16 @@ pair<HGenome, HGenome> invert_ME(const pair<HGenome, HGenome>& apx_bounds, funct
 //        }
         cout << "Used " << nc0s << " global seeds." << endl;
     }
+
+    cout << "Before ME: Filled " << full_locs.size() << '/' << ME_C0H_EXIT
+//                << '/' << N_GRID
+//                 << ", " << C0H_in_arch << " with C0H"
+#if _USE_ALL_C0H
+        << "; found " << C0H_found << " C0H total"
+#endif
+        << "; dH " << get_dH(C0H_bounds.first, C0H_bounds.second)
+        << endl;
+        
 #endif
 //    while (n_eval < ME_NE_MAX && C0H_in_arch < ME_C0H_EXIT && time(nullptr) - start_time < max_runtime) { NOTE IF
 //    YOU UNCOMMENT THIS THESE VALUES ARE NOT DEFINED IN TEST.CPP
