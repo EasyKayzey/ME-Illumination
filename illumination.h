@@ -40,6 +40,8 @@ pair<int, int> normalize_curiosity(vector<int> &curiosity_index);
 tuple<double, double, HGenome, HGenome> get_f_cost(const FGenome& epsilon, rng& gen, FConstants& constants,
                                                    function<int(const BArr&)>& get_grid_idx);
 
+double get_dH(const HGenome& minH, const HGenome& maxH);
+
 void pairsort(tuple<double, double, HGenome, HGenome> *a, FGenome *b, int n, double p);
 
 void write_sfa(tuple<double, double, HGenome, HGenome> cost, ofstream& file, int n);
