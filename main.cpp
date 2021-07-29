@@ -14,7 +14,7 @@ int ME_NE_MAX = 2000000, ME_BS = 2000, ME_C0H_EXIT = 100;
 double P_HC = .1, P_HM = .3, S_HM = 15e-3;
 int N_LINES = 10000, N_LBINARY = 8, N_LSAMPLES = 4;
 double L_EXIT = 1e-8, L_BIAS = 1.2;
-int N_FP = 50, N_FGEN = 20, N_FTOURN = 3, GR_F = N_FP - 2, N_PRE_SEEDING = 1;
+int N_FP = 3, N_FGEN = 20, N_FTOURN = 3, GR_F = N_FP - 2, N_PRE_SEEDING = 0;
 double S_FA = 0.05, S_FT = 0.1, A_MAX = 0.2, A_MIN = A_MAX * 0.5, P_FC = 0.6, B_FC = 0.3, P_FM = 0.1, BETA_FCOST = 0;
 int main_start_time, max_runtime_ME = 900, max_runtime_GGA = 24*60*60;
 int max_seeds_ME = ME_NE_MAX / 1.5;
@@ -22,14 +22,14 @@ double cost_multiplier = 1;
 int seed;
 int N_PFA = 2, N_PFS = 6;
 #if UPDATE_ME_MUTATION_RATE
-double cur_gen_mut = 0, dyn_mut_para = 0.005 / N_FP, dyn_mut_target = .4;
+double cur_gen_mut = 0, dyn_mut_para = 0, dyn_mut_target = .4;
 #endif
 array<double, L> omega;
 HGenome mu_true;
 
 extern unordered_set<HGenome> global_seeds;
 
-#define FIELD_TESTING false
+#define FIELD_TESTING true
 
 #define _PARA_GGA false
 #define _SAVE_ALL_POP true
@@ -51,24 +51,27 @@ int main(int argc, char** argv) {
         for (int i = 1; i < argc; ++i)
             cout << argv[i] << " ";
         cout << endl;
-#if FIELD_TESTING == false
-        if (argc > 2) {
-            A_MAX = stod(argv[2], nullptr);
-            A_MIN = A_MAX * .5;
-        }
         if (argc > 3) {
-            T = stod(argv[3], nullptr);
-            N_T_double = N_T_double * T / 10;
+            ME_NE_MAX = stoi(argv[3], nullptr);
         }
-        if (argc > 4)
-            cost_multiplier = stod(argv[4], nullptr);
+#if FIELD_TESTING == false
+        // if (argc > 2) {
+        //     A_MAX = stod(argv[2], nullptr);
+        //     A_MIN = A_MAX * .5;
+        // }
+        // if (argc > 3) {
+        //     T = stod(argv[3], nullptr);
+        //     N_T_double = N_T_double * T / 10;
+        // }
+        // if (argc > 4)
+        //     cost_multiplier = stod(argv[4], nullptr);
 #endif
     }
 
     N_T = (int) round(N_T_double);
     DELTA_T = T / N_T;
 
-    string message = "LOR";
+    string message = "METEST";
     if (argc > 1) {
         for (int i = 1; i < argc; ++i) {
             message += '_';

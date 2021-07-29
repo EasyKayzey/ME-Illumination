@@ -57,7 +57,7 @@ pair<HGenome, HGenome> run_illumination(FConstants& constants, const vector<doub
 #define _PARA_ME true
 #define _USE_ALL_C0H true
 #define _USE_GLOBAL_SEEDS true
-#define _SEED_ALL_C0H_GLOBALLY true
+#define _SEED_ALL_C0H_GLOBALLY false
 #define _REVITALIZE_ON_CURIOSITY_DEATH true
 pair<HGenome, HGenome> invert_ME(const pair<HGenome, HGenome>& apx_bounds, function<OArr(const HGenome&)>& get_obs,
                                  function<BArr(const OArr&)>& get_beh, function<int(const BArr&)>& get_grid_idx,
