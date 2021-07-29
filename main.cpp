@@ -8,11 +8,11 @@
 
 double T = 4000, DELTA_T, N_T_double = 500;
 int N_T;
-double h_guess_err = 0.5;
+double h_guess_err = 1.0;
 double obs_err = 0.01, amp_err = 0.001;
 int ME_NE_MAX = 2000000, ME_BS = 2000, ME_C0H_EXIT = 100;
 double P_HC = .2, P_HM = .2, S_HM = 15e-3;
-int N_LINES = 10000, N_LBINARY = 8, N_LSAMPLES = 4;
+int N_LINES = 10000, N_LBINARY = 9, N_LSAMPLES = 4;
 double L_EXIT = 1e-8, L_BIAS = 1.2;
 int N_FP = 3, N_FGEN = 14, N_FTOURN = 3, GR_F = N_FP - 2, N_PRE_SEEDING = 0;
 double S_FA = 0.05, S_FT = 0.1, A_MAX = 0.2, A_MIN = A_MAX * 0.5, P_FC = 0.6, B_FC = 0.3, P_FM = 0.1, BETA_FCOST = 0;
