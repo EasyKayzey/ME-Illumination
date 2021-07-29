@@ -284,9 +284,10 @@ pair<HGenome, HGenome> invert_ME(const pair<HGenome, HGenome>& apx_bounds, funct
                 // crossover
                 int p1 = curiosity_select(full_locs, archive_curiosity_index, archive_has, U1(gen));
                 int p2 = curiosity_select(full_locs, archive_curiosity_index, archive_has, U1(gen));
-                int gamma = U1(gen);
-                for (int j = 0; j < N_H; ++j)
+                for (int j = 0; j < N_H; ++j) {
+                    int gamma = U1(gen);
                     init_pop_gen[i][j] = gamma * get<1>(archive[p1])[j] + (1 - gamma) * get<1>(archive[p2])[j];
+                }
                 parent_of[i] = p1;
             } else {
                 // random variation
