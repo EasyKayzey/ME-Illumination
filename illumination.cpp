@@ -148,12 +148,12 @@ pair<HGenome, HGenome> invert_ME(const pair<HGenome, HGenome>& apx_bounds, funct
                 line_starts[l] = line_start;
             }
 
+            atomic_int line_exit_sum = 0;
+            vector<vector<tuple<HGenome, OArr, double, BArr, int>>> line_seeds(N_LINES);
             vector<double> bias_vals(N_LINES * N_LSAMPLES);
             for (int i = 0; i < N_LINES * N_LSAMPLES; ++i)
                 bias_vals[i] = U1(gen);
 
-            atomic_int line_exit_sum = 0;
-            vector<vector<tuple<HGenome, OArr, double, BArr, int>>> line_seeds(N_LINES);
 #pragma omp parallel for default(none) shared(N_LINES, N_LBINARY, N_LSAMPLES, L_BIAS, L_EXIT, get_obs, get_cost, get_beh, get_grid_idx, line_starts, apx_bounds, mu_true, line_exit_sum, line_seeds, bias_vals)
             for (int l = 0; l < N_LINES; ++l) {
                 HGenome &line_start = line_starts[l], biased_endpoint;
@@ -175,7 +175,7 @@ pair<HGenome, HGenome> invert_ME(const pair<HGenome, HGenome>& apx_bounds, funct
                     }
                 }
                 line_exit_sum += bsi;
-                biased_endpoint = bias_HG(mu_true, mid, L_BIAS);
+                biased_endpoint = bias_HG(mu_true, upper, L_BIAS);
                 for (int i = 0; i < N_LSAMPLES; ++i) {
                     HGenome cur_sam = bias_HG(mu_true, biased_endpoint, bias_vals[l * N_LSAMPLES + i]);
                     OArr obs = get_obs(cur_sam);
@@ -197,7 +197,7 @@ pair<HGenome, HGenome> invert_ME(const pair<HGenome, HGenome>& apx_bounds, funct
                     seed_saves_using.push_back(true);
                 }
             }
-            cout << "Average line binary search exit length is " << (double) line_exit_sum / N_LBINARY << endl;
+            cout << "Average line binary search exit length is " << (double) line_exit_sum / N_LINES << endl;
         }
 
         cout << "Testing all evaluated seeds..." << endl;
