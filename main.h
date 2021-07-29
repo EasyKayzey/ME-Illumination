@@ -70,6 +70,8 @@ vector<DArr> gen_pop_graphs(const vector<double>& eps_inter, const EMatrix& CP, 
 
 vector<double> f_to_inter_t(const FGenome& epsilon);
 
+double get_dH(const HGenome& minH, const HGenome& maxH);
+
 int tournament_select_f(const double* costs, int n, rng& gen, uniform_real_distribution<> U1);
 
 template <class T, class F> void print_vec(vector<vector<T>> vec, ofstream& outfile, F lambda);
