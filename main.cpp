@@ -346,12 +346,13 @@ int main(int argc, char** argv) {
 //#endif
 //    for (int i = GR_F; i < N_FP; ++i)
 //        cur_costs[i] = get_f_cost(population[i], gen, constants, get_grid_idx);
-    array<double, 7> mut_params{1e-4, 3e-4, 1e-3, 3e-3, 1e-2, 3e-2, 1e-1};
+    array<double, 7> mut_mags{1e-4, 3e-4, 1e-3, 3e-3, 1e-2, 3e-2, 1e-1};
+    
 
     ptime();
     cout << "\n\nPre-calculations complete. Starting GA:\n" << endl;
     while (s < N_FGEN && time(nullptr) - main_start_time < max_runtime_GGA) {
-        S_HM = mut_params[s / 2];
+        S_HM = mut_mags[s / 2];
 #if _PARA_GGA
 #pragma omp parallel for default(shared)
 #endif
