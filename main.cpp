@@ -870,13 +870,17 @@ tuple<double, double, HGenome, HGenome> get_f_cost(const FGenome& epsilon, rng& 
 
     HGenome true_vals = mu_true;
 
+    double dH = get_dH(minH, maxH);
+    cout << "Final dH equals " << dH << endl << endl;
+    return {cost_multiplier * (dH + BETA_FCOST * flu), dH, minH, maxH};
+}
+
+double get_dH(const HGenome& minH, const HGenome& maxH) {
     double dH = 0;
     for (int i = 0; i < N_H; ++i)
-        if (true_vals[i] != 0)
-            dH += abs((maxH[i] - minH[i]) / (2 * true_vals[i]));
-
-    cout << "dH equals " << dH << endl << endl;
-    return {cost_multiplier * (dH + BETA_FCOST * flu), dH, minH, maxH};
+        if (mu_true[i] != 0)
+            dH += abs((maxH[i] - minH[i]) / (2 * mu_true[i]));
+    return dH;
 }
 
 void pairsort(tuple<double, double, HGenome, HGenome> *a, FGenome *b, int n, double p) {

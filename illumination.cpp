@@ -367,7 +367,7 @@ pair<HGenome, HGenome> invert_ME(const pair<HGenome, HGenome>& apx_bounds, funct
 #endif
 //                 << "; min cost " << min_cost
                  << "; curiosity sum " << norm_res.second << "; non-zero curiosity num " << norm_res.first
-                 << "; n deaths " << n_c_deaths
+                 << "; n deaths " << n_c_deaths << "; dH " << get_dH(C0H_bounds.first, C0H_bounds.second)
                  << endl;
         }
 #endif
