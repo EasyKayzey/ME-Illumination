@@ -7,8 +7,6 @@
 
 #include "main.h"
 
-#define UPDATE_ME_MUTATION_RATE true
-
 const int N_H = (DIM * (DIM - 1)) / 2;
 const int N_BEH = N_OBS;
 const int N_GRID = 10000;

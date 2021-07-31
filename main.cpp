@@ -21,9 +21,6 @@ int max_seeds_ME = ME_NE_MAX / 1.5;
 double cost_multiplier = 1;
 int seed;
 int N_PFA = 2, N_PFS = 6;
-#if UPDATE_ME_MUTATION_RATE
-double cur_gen_mut = 0, dyn_mut_para = 0, dyn_mut_target = .4;
-#endif
 array<double, L> omega;
 HGenome mu_true;
 
@@ -425,12 +422,6 @@ int main(int argc, char** argv) {
         min_field_val.push_back(min_field);
         max_field_val.push_back(max_field);
 
-#if UPDATE_ME_MUTATION_RATE
-        cout << "Updated mutation parameter from " << S_HM;
-        S_HM *= (1 + dyn_mut_para * cur_gen_mut);
-        cout << " to " << S_HM << endl;
-#endif
-
         ++s;
 
         ptime();
@@ -457,7 +448,7 @@ int main(int argc, char** argv) {
                               (int) global_seeds.size(), N_PRE_SEEDING, N_GRID, N_TO, N_OBS, N_PFA, max_seeds_ME, -1, -1,
                               -1, -1, -1, -1, -1, -1, -1};
             double out_doubles[] = {T, h_guess_err, -1, P_HC, P_HM, S_HM, S_FA, S_FT, A_MAX, P_FC, P_FM, BETA_FCOST,
-                                    -1, HBAR, L_EXIT, L_BIAS, obs_err, amp_err, dyn_mut_para, dyn_mut_target,
+                                    -1, HBAR, L_EXIT, L_BIAS, obs_err, amp_err, -1, -1,
                                     init_S_HM, B_FC, A_MIN, cost_multiplier, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
 
             if (message.empty())
@@ -660,7 +651,6 @@ int main(int argc, char** argv) {
         hfile << "Note that the first set of " << N_PFS << " fields are best, then the next set are median." << endl;
 
         max_runtime_ME *= 2;
-        dyn_mut_para = 0;
 
         int CMNM = ME_NE_MAX;
         ME_NE_MAX *= 2;

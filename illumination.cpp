@@ -433,10 +433,6 @@ pair<HGenome, HGenome> invert_ME(const pair<HGenome, HGenome>& apx_bounds, funct
     ME_C0H_EXIT = max(C0H_in_arch, ME_C0H_EXIT);
 #endif
 #undef UPDATE_C0H_EXIT_NUM
-#if UPDATE_ME_MUTATION_RATE
-    extern double cur_gen_mut, dyn_mut_target;
-    cur_gen_mut += ((C0H_found + 0.0) / n_eval) - dyn_mut_target;
-#endif
     return C0H_bounds;
 }
 
