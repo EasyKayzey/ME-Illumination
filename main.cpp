@@ -660,7 +660,7 @@ int main(int argc, char** argv) {
         S_HM = init_S_HM;
         cout << "Running with current archive and S_HM = " << S_HM << ':' << endl;
         hfile << "\nRunning with current archive and S_HM = " << S_HM << ':' << endl;
-        for (int i = 0; i < samples.size(); ++i, gen.discard(i))
+        for (int i = 0; i < (long long) samples.size(); ++i, gen.discard(i))
             write_sfa(get_f_cost(samples[i], gen, constants, get_grid_idx), hfile, i);
 
         ptime();
@@ -698,7 +698,7 @@ int main(int argc, char** argv) {
             S_HM = init_S_HM / 2;
             cout << "\n\nr =" << r << "; " << ME_NE_MAX << "; " << S_HM << endl;
             hfile << "\n\nr =" << r << "; " << ME_NE_MAX << "; " << S_HM << endl;
-            for (int i = 0; i < samples.size(); ++i, gen.discard(i))
+            for (int i = 0; i < (long long) samples.size(); ++i, gen.discard(i))
                 write_sfa(get_f_cost(samples[i], gen, constants, get_grid_idx), hfile, i);
 
 //            ME_NE_MAX = CMNM;
@@ -711,7 +711,7 @@ int main(int argc, char** argv) {
             S_HM = init_S_HM * 2;
             cout << "\n\nr =" << r << "; " << ME_NE_MAX << "; " << S_HM << endl;
             hfile << "\n\nr =" << r << "; " << ME_NE_MAX << "; " << S_HM << endl;
-            for (int i = 0; i < samples.size(); ++i, gen.discard(i))
+            for (int i = 0; i < (long long) samples.size(); ++i, gen.discard(i))
                 write_sfa(get_f_cost(samples[i], gen, constants, get_grid_idx), hfile, i);
 
             ME_NE_MAX = CMNM;
@@ -857,8 +857,6 @@ tuple<double, double, HGenome, HGenome> get_f_cost(const FGenome& epsilon, rng& 
     for (double d : eps_inter)
         flu += d * d;
     flu /= N_T;
-
-    HGenome true_vals = mu_true;
 
     double dH = get_dH(minH, maxH);
     cout << "Final dH equals " << dH << endl << endl;
