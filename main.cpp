@@ -346,14 +346,14 @@ int main(int argc, char** argv) {
 //#endif
 //    for (int i = GR_F; i < N_FP; ++i)
 //        cur_costs[i] = get_f_cost(population[i], gen, constants, get_grid_idx);
-    array<double, 9> mut_prbs{.1, .2, .3,       .1, .2, .3,          .1, .2, .3};
-    array<double, 9> crs_prbs{.1, .1, .1,       .2, .2, .2,          .3, .3, .3};
+    array<double, 5> mut_prbs{.2, .3, .4, .5, .6};
+    // array<double, 9> crs_prbs{.1, .1, .1,       .2, .2, .2,          .3, .3, .3};
 
     ptime();
     cout << "\n\nPre-calculations complete. Starting GA:\n" << endl;
     while (s < N_FGEN && time(nullptr) - main_start_time < max_runtime_GGA) {
         P_HM = mut_prbs[s / 2];
-        P_HC = crs_prbs[s / 2];
+        // P_HC = crs_prbs[s / 2];
 #if _PARA_GGA
 #pragma omp parallel for default(shared)
 #endif
