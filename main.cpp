@@ -14,7 +14,7 @@ int ME_NE_MAX = 2000000, ME_BS = 2000, ME_C0H_EXIT = 100;
 double P_HC = .2, P_HM = .3, S_HM = 8e-3;
 int N_LINES = 10000, N_LBINARY = 9, N_LSAMPLES = 4;
 double L_EXIT = 1e-8, L_BIAS = 1.2;
-int N_FP = 3, N_FGEN = 10, N_FTOURN = 3, GR_F = N_FP - 2, N_PRE_SEEDING = 0;
+int N_FP = 3, N_FGEN = 12, N_FTOURN = 3, GR_F = N_FP - 2, N_PRE_SEEDING = 0;
 double S_FA = 0.05, S_FT = 0.1, A_MAX = 0.2, A_MIN = A_MAX * 0.5, P_FC = 0.6, B_FC = 0.3, P_FM = 0.1, BETA_FCOST = 0;
 int main_start_time, max_runtime_ME = 900, max_runtime_GGA = 24*60*60;
 int max_seeds_ME = ME_NE_MAX / 1.5;
@@ -346,14 +346,14 @@ int main(int argc, char** argv) {
 //#endif
 //    for (int i = GR_F; i < N_FP; ++i)
 //        cur_costs[i] = get_f_cost(population[i], gen, constants, get_grid_idx);
-    array<double, 5> mut_prbs{.2, .3, .4, .5, .6};
+    array<double, 6> crs_prbs{.1, .2, .3, .4, .5, .6};
     // array<double, 9> crs_prbs{.1, .1, .1,       .2, .2, .2,          .3, .3, .3};
 
     ptime();
     cout << "\n\nPre-calculations complete. Starting GA:\n" << endl;
     while (s < N_FGEN && time(nullptr) - main_start_time < max_runtime_GGA) {
-        P_HM = mut_prbs[s / 2];
-        // P_HC = crs_prbs[s / 2];
+        // P_HM = mut_prbs[s / 2];
+        P_HC = crs_prbs[s / 2];
 #if _PARA_GGA
 #pragma omp parallel for default(shared)
 #endif
