@@ -6,7 +6,7 @@
 #include "lab.h"
 #include "cvt.h"
 
-double T = 4000, DELTA_T, N_T_double = 500;
+double T = 4000, DELTA_T, N_T_double = 250;
 int N_T;
 double h_guess_err = 1.0;
 double obs_err = 0.01, amp_err = 0.001;
@@ -14,7 +14,7 @@ int ME_NE_MAX = 2000000, ME_BS = 2000, ME_C0H_EXIT = 100;
 double P_HC = .2, P_HM = .3, S_HM = 8e-3;
 int N_LINES = 10000, N_LBINARY = 9, N_LSAMPLES = 4;
 double L_EXIT = 1e-8, L_BIAS = 1.2;
-int N_FP = 50, N_FGEN = 20, N_FTOURN = 3, GR_F = N_FP - 2, N_PRE_SEEDING = 1;
+int N_FP = 50, N_FGEN = 7, N_FTOURN = 3, GR_F = N_FP - 2, N_PRE_SEEDING = 1;
 double S_FA = 0.05, S_FT = 0.1, A_MAX = 0.2, A_MIN = A_MAX * 0.5, P_FC = 0.6, B_FC = 0.3, P_FM = 0.1, BETA_FCOST = 0;
 int main_start_time, max_runtime_ME = 900, max_runtime_GGA = 24*60*60;
 int max_seeds_ME = ME_NE_MAX / 1.5;
@@ -50,22 +50,18 @@ int main(int argc, char** argv) {
         cout << endl;
 #if FIELD_TESTING == false
         if (argc > 2) {
-            A_MAX = stod(argv[2], nullptr);
-            A_MIN = A_MAX * .5;
+            S_FA = stod(argv[2], nullptr);
         }
         if (argc > 3) {
-            T = stod(argv[3], nullptr);
-            N_T_double = N_T_double * T / 10;
+            S_FT = stod(argv[3], nullptr);
         }
-        if (argc > 4)
-            cost_multiplier = stod(argv[4], nullptr);
 #endif
     }
 
     N_T = (int) round(N_T_double);
     DELTA_T = T / N_T;
 
-    string message = "LOR";
+    string message = "FPT1";
     if (argc > 1) {
         for (int i = 1; i < argc; ++i) {
             message += '_';
