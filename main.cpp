@@ -15,10 +15,10 @@ double P_HC = .2, P_HM = .3, S_HM = 8e-3;
 int N_LINES = 10000, N_LBINARY = 9, N_LSAMPLES = 4;
 double L_EXIT = 1e-8, L_BIAS = 1.2;
 int N_FP = 50, N_FGEN = 7, N_FTOURN = 3, GR_F = N_FP - 2, N_PRE_SEEDING = 0;
-double S_FA = 0.05, S_FT = 0.1, A_MAX = 0.2, A_MIN = A_MAX * 0.5, P_FC = 0.6, B_FC = 0.3, P_FM = 0.1, BETA_FCOST = 0;
+double S_FA = 0.05, S_FT = 0.2, A_MAX = 0.2, A_MIN = A_MAX * 0.5, P_FC = 0.6, B_FC = 0.3, P_FM = 0.1, BETA_FCOST = 0;
 int main_start_time, max_runtime_ME = 900, max_runtime_GGA = 24*60*60;
 int max_seeds_ME = ME_NE_MAX / 1.5;
-double cost_multiplier = 1;
+double cost_multiplier = 1;s
 int seed;
 int N_PFA = 1, N_PFS = 3;
 array<double, L> omega;
