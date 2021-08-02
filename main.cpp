@@ -39,7 +39,7 @@ int main(int argc, char** argv) {
     }
     hash<string> hash_string;
     seed = hash_string(to_string(main_start_time));
-    seed = 1000;
+    // seed = 1000;
 
     double init_S_HM = S_HM;
 
