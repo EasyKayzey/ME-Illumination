@@ -50,10 +50,10 @@ int main(int argc, char** argv) {
         cout << endl;
 #if FIELD_TESTING == false
         if (argc > 2) {
-            P_FC = stod(argv[2], nullptr);
+            N_FTOURN = stoi(argv[2], nullptr);
         }
         if (argc > 3) {
-            P_FM = stod(argv[3], nullptr);
+            GR_F = N_FP - stoi(argv[3], nullptr);
         }
 #endif
     }
