@@ -50,10 +50,13 @@ int main(int argc, char** argv) {
         cout << endl;
 #if FIELD_TESTING == false
         if (argc > 2) {
-            N_FTOURN = stoi(argv[2], nullptr);
+            A_MAX = stod(argv[2], nullptr);
+            A_MIN = 0.5 * A_MAX;
         }
         if (argc > 3) {
-            GR_F = N_FP - stoi(argv[3], nullptr);
+            double OLD_T = T;
+            T = stod(argv[3], nullptr);
+            N_T = (int) (N_T * OLD_T / T);
         }
 #endif
     }
