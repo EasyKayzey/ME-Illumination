@@ -56,7 +56,7 @@ int main(int argc, char** argv) {
         if (argc > 3) {
             double OLD_T = T;
             T = stod(argv[3], nullptr);
-            N_T = (int) (N_T * OLD_T / T);
+            N_T = (int) (N_T * T / OLD_T);
         }
 #endif
     }
