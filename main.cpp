@@ -8,11 +8,11 @@
 
 double T = 4000, DELTA_T, N_T_double = 250;
 int N_T;
-double h_guess_err = 1.0;
+double h_guess_err = 3.0;
 double obs_err = 0.01, amp_err = 0.001;
 int ME_NE_MAX = 2000000, ME_BS = 2000, ME_C0H_EXIT = 100;
 double P_HC = .2, P_HM = .3, S_HM = 8e-3;
-int N_LINES = 10000, N_LBINARY = 9, N_LSAMPLES = 4;
+int N_LINES = 10000, N_LBINARY = 10, N_LSAMPLES = 4;
 double L_EXIT = 1e-8, L_BIAS = 1.2;
 int N_FP = 50, N_FGEN = 7, N_FTOURN = 3, GR_F = N_FP - 2, N_PRE_SEEDING = 1;
 double S_FA = 0.05, S_FT = 0.2, A_MAX = 0.2, A_MIN = A_MAX * 0.5, P_FC = 0.7, B_FC = 0.3, P_FM = 0.2, BETA_FCOST = 0;
@@ -31,6 +31,23 @@ extern unordered_set<HGenome> global_seeds;
 #define _PARA_GGA false
 #define _SAVE_ALL_POP true
 int main(int argc, char** argv) {
+
+
+
+
+
+
+    cost_multiplier = -1;
+
+
+
+
+
+
+
+
+
+
     { // this will only work until 2038 so be careful
         time_t now;
         main_start_time = time(&now);
