@@ -10,7 +10,7 @@ endif()
 
 set(CMAKE_CXX_FLAGS "-Wall -Wextra -fopenmp -march=skylake-avx512")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -ffast-math")
 # end attempt
 
 IF (WIN32)

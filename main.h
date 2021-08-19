@@ -38,7 +38,7 @@ using namespace Eigen;
 const int DIM = 6;
 const int L = (DIM * (DIM - 1)) / 2;
 const double HBAR = 1;
-const int N_TO = 2;
+const int N_TO = 10;
 const int N_OBS = DIM * N_TO;
 
 typedef Matrix<complex<double>, DIM, DIM> EMatrix;

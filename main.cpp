@@ -6,7 +6,7 @@
 #include "lab.h"
 #include "cvt.h"
 
-double T = 4000, DELTA_T, N_T_double = 250;
+double T = 20000, DELTA_T, N_T_double = 2000;
 int N_T;
 double h_guess_err = 1.0;
 double obs_err = 0.01, amp_err = 0.001;
@@ -14,13 +14,13 @@ int ME_NE_MAX = 2000000, ME_BS = 2000, ME_C0H_EXIT = 100;
 double P_HC = .2, P_HM = .3, S_HM = 8e-3;
 int N_LINES = 10000, N_LBINARY = 9, N_LSAMPLES = 4;
 double L_EXIT = 1e-8, L_BIAS = 1.2;
-int N_FP = 50, N_FGEN = 7, N_FTOURN = 3, GR_F = N_FP - 2, N_PRE_SEEDING = 1;
-double S_FA = 0.05, S_FT = 0.2, A_MAX = 0.2, A_MIN = A_MAX * 0.5, P_FC = 0.7, B_FC = 0.3, P_FM = 0.2, BETA_FCOST = 0;
-int main_start_time, max_runtime_ME = 900, max_runtime_GGA = 24*60*60;
+int N_FP = 50, N_FGEN = 1, N_FTOURN = 3, GR_F = N_FP - 2, N_PRE_SEEDING = 1;
+double S_FA = 0.05, S_FT = 0.2, A_MAX = 0.02, A_MIN = A_MAX * 0.5, P_FC = 0.7, B_FC = 0.3, P_FM = 0.2, BETA_FCOST = 0;
+int main_start_time, max_runtime_ME = 9000, max_runtime_GGA = 24*60*60;
 int max_seeds_ME = ME_NE_MAX / 1.5;
 double cost_multiplier = 1;
 int seed;
-int N_PFA = 1, N_PFS = 3;
+int N_PFA = 1, N_PFS = 1;
 array<double, L> omega;
 HGenome mu_true;
 
@@ -39,7 +39,7 @@ int main(int argc, char** argv) {
     }
     hash<string> hash_string;
     seed = hash_string(to_string(main_start_time));
-    // seed = 1000;
+    seed = 1000;
 
     double init_S_HM = S_HM;
 
@@ -725,8 +725,8 @@ int main(int argc, char** argv) {
 }
 
 double envelope_funct(double t) {
-    static_assert(N_TO == 2, "The current envelope function is a double bell curve...\n");
-    return exp(-30 * (2 * t / T - .5) * (2 * t / T - .5)) + exp(-30 * ((2 * t - T) / T - .5) * ((2 * t - T) / T - .5));
+    // static_assert(N_TO == 2, "The current envelope function is a double bell curve...\n");
+    return exp(-30 * (t / T - .5) * (t / T - .5));
 }
 
 
